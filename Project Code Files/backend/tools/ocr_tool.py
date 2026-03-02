@@ -7,7 +7,7 @@ import pdfplumber
 import pytesseract
 import requests
 from pdf2image import convert_from_bytes
-from PIL import Image
+from PIL import Image, ImageFilter, ImageOps
 
 
 SUPPORTED_LANGUAGES = {"hin": "Hindi", "ben": "Bengali", "tel": "Telugu"}
@@ -19,6 +19,13 @@ class OCRResult:
     raw_text: str
     detected_language: str
     confidence_score: float
+
+
+def _preprocess_for_ocr(image: Image.Image) -> Image.Image:
+    # Quick OCR wins: grayscale -> light denoise -> binary threshold
+    grayscale = ImageOps.grayscale(image)
+    denoised = grayscale.filter(ImageFilter.MedianFilter(size=3))
+    return denoised.point(lambda p: 255 if p > 170 else 0)
 
 
 def _ocr_text_and_confidence(image: Image.Image, lang: str) -> tuple[str, float]:
@@ -82,7 +89,8 @@ def run_ocr(file_url: str, language: str) -> OCRResult:
         page_text: list[str] = []
         confidences: list[float] = []
         for image in _iter_pdf_images(file_bytes, total_pages=total_pages):
-            text, conf = _ocr_text_and_confidence(image, language)
+            processed_image = _preprocess_for_ocr(image)
+            text, conf = _ocr_text_and_confidence(processed_image, language)
             page_text.append(text)
             confidences.append(conf)
 
@@ -90,5 +98,6 @@ def run_ocr(file_url: str, language: str) -> OCRResult:
         return OCRResult(raw_text="\n".join(page_text).strip(), detected_language=language, confidence_score=conf)
 
     with Image.open(BytesIO(file_bytes)) as image:
-        text, conf = _ocr_text_and_confidence(image, language)
+        processed_image = _preprocess_for_ocr(image)
+        text, conf = _ocr_text_and_confidence(processed_image, language)
     return OCRResult(raw_text=text, detected_language=language, confidence_score=conf)
