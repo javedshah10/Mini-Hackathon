@@ -40,6 +40,7 @@ Background polling (APScheduler) runs every `POLLING_INTERVAL_SECONDS` and auto-
 ## 4) Database Schema (Phase 1 Required)
 
 Schema is documented and included in `backend/schema.sql`.
+For Phase 1 FK compatibility, minimal placeholder tables (`citizens`, `employees`, `departments`) are included so migrations run cleanly in Supabase.
 
 ### `submissions`
 ```sql

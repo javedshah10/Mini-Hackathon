@@ -2,6 +2,21 @@
 
 create extension if not exists pgcrypto;
 
+create table if not exists citizens (
+  id uuid primary key default gen_random_uuid(),
+  created_at timestamp default now()
+);
+
+create table if not exists employees (
+  id uuid primary key default gen_random_uuid(),
+  created_at timestamp default now()
+);
+
+create table if not exists departments (
+  id uuid primary key default gen_random_uuid(),
+  created_at timestamp default now()
+);
+
 create table if not exists submissions (
   id uuid primary key default gen_random_uuid(),
   citizen_id uuid references citizens(id),
