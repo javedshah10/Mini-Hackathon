@@ -1,26 +1,40 @@
-import os
-from io import BytesIO
 from typing import Dict
 
 import requests
 from google.cloud import vision
 
 
+STAMP_KEYWORDS = {"stamp", "seal", "emblem"}
+SIGNATURE_KEYWORDS = {"signature", "autograph", "sign"}
+
+
+def _download_document(file_url: str) -> bytes:
+    if file_url.startswith("http"):
+        response = requests.get(file_url, timeout=30)
+        response.raise_for_status()
+        return response.content
+    with open(file_url, "rb") as file:
+        return file.read()
+
+
 def detect_stamp_signature(file_url: str) -> Dict[str, float | bool | str]:
-    # Placeholder implementation for Phase 1.
-    file_bytes = requests.get(file_url, timeout=30).content if file_url.startswith("http") else open(file_url, "rb").read()
+    """Phase 1 placeholder implementation using Google Vision object localization."""
+    file_bytes = _download_document(file_url)
 
     client = vision.ImageAnnotatorClient()
     image = vision.Image(content=file_bytes)
-    response = client.document_text_detection(image=image)
-    text = response.full_text_annotation.text.lower() if response.full_text_annotation else ""
+    response = client.object_localization(image=image)
 
-    stamp_detected = "stamp" in text or "seal" in text
-    signature_detected = "signature" in text or "sign" in text
+    objects = response.localized_object_annotations or []
+    labels = {obj.name.lower() for obj in objects}
+
+    stamp_detected = any(any(key in label for key in STAMP_KEYWORDS) for label in labels)
+    signature_detected = any(any(key in label for key in SIGNATURE_KEYWORDS) for label in labels)
+    confidence_score = round(max((obj.score for obj in objects), default=0.0), 2)
 
     return {
         "stamp_detected": stamp_detected,
         "signature_detected": signature_detected,
-        "confidence_score": 0.55 if (stamp_detected or signature_detected) else 0.35,
-        "note": "Phase 1 placeholder using Google Vision text heuristics.",
+        "confidence_score": confidence_score,
+        "note": "Phase 1 placeholder — Google Vision API. Production will use YOLOv8 + OpenCV.",
     }

@@ -1,6 +1,6 @@
 from typing import Any, Dict
 
-from db import get_submission_with_document, log_tool_event, update_submission_status
+from db import get_submission_with_document, log_tool_event, update_document_analysis, update_submission_status
 from tools.audit_logger_tool import write_final_result
 from tools.classifier_tool import classify_document
 from tools.field_extractor_tool import extract_fields
@@ -63,6 +63,12 @@ def run_submission_pipeline(submission_id: str) -> Dict[str, Any]:
             output_summary=classification,
         )
 
+        update_document_analysis(
+            submission_id=submission_id,
+            quality_score=ocr_result.confidence_score,
+            doc_type=classification.get("doc_type"),
+        )
+
         validation = validate_fields(fields)
         log_tool_event(
             submission_id,
@@ -86,6 +92,8 @@ def run_submission_pipeline(submission_id: str) -> Dict[str, Any]:
         if float(fields.get("confidence_score") or 0) < 0.6:
             overall_status = "escalated"
 
+        _log_skipped(submission_id, "fraud_tamper_tool", "Phase 1 — out of scope")
+
         final_result = write_final_result(
             submission_id=submission_id,
             overall_status=overall_status,
@@ -106,7 +114,6 @@ def run_submission_pipeline(submission_id: str) -> Dict[str, Any]:
 
         _log_skipped(submission_id, "notification_tool", "Phase 1 — Streamlit UI handles display")
         _log_skipped(submission_id, "sync_manager_tool", "Phase 1 — offline mode not supported")
-        _log_skipped(submission_id, "fraud_tamper_tool", "Phase 1 — out of scope")
 
         return {"status": overall_status, "result": final_result}
     except Exception as exc:

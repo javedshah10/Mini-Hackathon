@@ -22,10 +22,19 @@ def get_supabase() -> Client:
     return supabase
 
 
-def create_submission(department_id: Optional[str] = None, channel: str = "assisted") -> Dict[str, Any]:
+def create_submission(
+    department_id: Optional[str] = None,
+    channel: str = "assisted",
+    citizen_id: Optional[str] = None,
+    employee_id: Optional[str] = None,
+) -> Dict[str, Any]:
     payload: Dict[str, Any] = {"channel": channel, "status": "pending"}
     if department_id:
         payload["department_id"] = department_id
+    if citizen_id:
+        payload["citizen_id"] = citizen_id
+    if employee_id:
+        payload["employee_id"] = employee_id
     response = get_supabase().table("submissions").insert(payload).execute()
     return response.data[0]
 
@@ -58,6 +67,14 @@ def upload_document(file_path: str, file_name: str, content_type: str) -> str:
         )
     return client.storage.from_(SUPABASE_BUCKET).get_public_url(file_name)
 
+
+
+
+def update_document_analysis(submission_id: str, quality_score: float, doc_type: Optional[str] = None) -> None:
+    payload: Dict[str, Any] = {"quality_score": round(float(quality_score), 2)}
+    if doc_type:
+        payload["doc_type"] = doc_type
+    get_supabase().table("documents").update(payload).eq("submission_id", submission_id).execute()
 
 def log_tool_event(
     submission_id: str,

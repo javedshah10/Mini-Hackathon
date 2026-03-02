@@ -5,7 +5,8 @@ from typing import Any, Dict
 from groq import Groq
 
 
-MODEL_NAME = os.getenv("GROQ_MODEL", "llama-3.1-8b-instant")
+DEFAULT_GROQ_MODEL = "llama3-groq-70b-8192-tool-use-preview"
+MODEL_NAME = os.getenv("GROQ_MODEL_NAME", DEFAULT_GROQ_MODEL)
 
 
 def extract_fields(raw_text: str) -> Dict[str, Any]:
