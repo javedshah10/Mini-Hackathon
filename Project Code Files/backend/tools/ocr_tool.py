@@ -34,7 +34,10 @@ def _ocr_text_and_confidence(image: Image.Image, lang: str) -> tuple[str, float]
 
         conf_raw = str(conf).strip()
         if conf_raw and conf_raw != "-1":
-            conf_values.append(float(conf_raw))
+            try:
+                conf_values.append(float(conf_raw))
+            except ValueError:
+                continue
 
     text_output = " ".join(words).strip()
     avg_conf = round(sum(conf_values) / (len(conf_values) * 100), 2) if conf_values else 0.0
@@ -54,7 +57,9 @@ def _iter_pdf_images(file_bytes: bytes, total_pages: int, chunk_size: int = PDF_
 
 def _download_file(file_url: str) -> bytes:
     if file_url.startswith("http"):
-        return requests.get(file_url, timeout=30).content
+        response = requests.get(file_url, timeout=30)
+        response.raise_for_status()
+        return response.content
     with open(file_url, "rb") as f:
         return f.read()
 
