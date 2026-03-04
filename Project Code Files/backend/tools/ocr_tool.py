@@ -10,7 +10,7 @@ from pdf2image import convert_from_bytes
 from PIL import Image, ImageFilter, ImageOps
 
 
-SUPPORTED_LANGUAGES = {"hin": "Hindi", "ben": "Bengali", "tel": "Telugu"}
+SUPPORTED_LANGUAGES = {"hin": "Hindi", "ben": "Bengali", "tel": "Telugu", "eng": "English"}
 PDF_CHUNK_SIZE = 5
 
 
@@ -73,7 +73,7 @@ def _download_file(file_url: str) -> bytes:
 
 def run_ocr(file_url: str, language: str) -> OCRResult:
     if language not in SUPPORTED_LANGUAGES:
-        raise ValueError("Language not supported in Phase 1. Supported: Hindi, Bengali, Telugu.")
+        raise ValueError("Language not supported in Phase 1. Supported: Hindi, Bengali, Telugu, English.")
 
     file_bytes = _download_file(file_url)
     is_pdf = file_url.lower().endswith(".pdf")

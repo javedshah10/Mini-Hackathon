@@ -19,7 +19,7 @@ Project Code Files/
 
 ## Prerequisites
 - Python 3.11+
-- Tesseract OCR with language packs: `hin`, `ben`, `tel`
+- Tesseract OCR with language packs: `hin`, `ben`, `tel`, `eng`
 - Poppler for scanned PDF conversion (`poppler-utils`)
 
 ## Backend Setup
@@ -69,6 +69,6 @@ streamlit run app.py
 
 ## Demo Notes
 - Max upload size: 5MB
-- Supported languages: Hindi (`hin`), Bengali (`ben`), Telugu (`tel`)
+- Supported languages: Hindi (`hin`), Bengali (`ben`), Telugu (`tel`), English (`eng`)
 - Unsupported language error is explicitly returned
 - Poller runs in backend and auto-processes pending submissions older than configured interval

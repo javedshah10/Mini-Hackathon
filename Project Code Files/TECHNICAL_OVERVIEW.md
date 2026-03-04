@@ -29,7 +29,7 @@ Background polling (APScheduler) runs every `POLLING_INTERVAL_SECONDS` and auto-
 
 ## 3) End-to-End Processing Flow
 
-1. Upload document (PDF/JPEG/PNG) and language (`hin`, `ben`, `tel`)
+1. Upload document (PDF/JPEG/PNG) and language (`hin`, `ben`, `tel`, `eng`)
 2. Save document in Supabase Storage + metadata rows in PostgreSQL
 3. Trigger processing manually (`/process`) or automatically via poller
 4. Execute tool pipeline and log each tool call event
@@ -150,7 +150,7 @@ This is configured in `backend/tools/field_extractor_tool.py` and exposed in `ba
 
 ## 9) Operational Notes
 
-- Install Tesseract language packs: `hin`, `ben`, `tel`
+- Install Tesseract language packs: `hin`, `ben`, `tel`, `eng`
 - Install Poppler (`poppler-utils`) for scanned PDF conversion
 - Configure Supabase/OpenAI/Groq/Google credentials in `backend/.env`
 - Set scheduler interval:

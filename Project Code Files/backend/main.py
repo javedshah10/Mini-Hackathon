@@ -49,7 +49,7 @@ async def submit_document(file: UploadFile = File(...), language: str = "hin") -
     if language not in SUPPORTED_LANGUAGES:
         raise HTTPException(
             status_code=400,
-            detail="Language not supported in Phase 1. Supported: Hindi, Bengali, Telugu.",
+            detail="Language not supported in Phase 1. Supported: Hindi, Bengali, Telugu, English.",
         )
 
     file_bytes = await file.read()

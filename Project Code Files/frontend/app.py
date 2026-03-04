@@ -10,7 +10,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 BACKEND_URL = os.getenv("BACKEND_URL", "http://localhost:8000")
-LANG_OPTIONS = {"Hindi": "hin", "Bengali": "ben", "Telugu": "tel"}
+LANG_OPTIONS = {"Hindi": "hin", "Bengali": "ben", "Telugu": "tel", "English": "eng"}
 
 st.set_page_config(page_title="AI Document Verification Demo", layout="wide")
 st.title("AI Document Verification Platform — Phase 1 Demo")
